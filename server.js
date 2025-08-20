@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const authRoutes = require('./src/routes/auth');
 const userRoutes = require('./src/routes/users');
 const nutritionRoutes = require('./src/routes/nutrition');
+const assignedWorkoutRoutes = require('./src/routes/assignedWorkouts');
 
 const app = express();
 app.use(cors());
@@ -24,5 +25,6 @@ app.get('/health', (_, res) => res.json({ ok: true }));
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/nutrition', nutritionRoutes);
+app.use('/workouts/assigned', assignedWorkoutRoutes);
 
 app.listen(process.env.PORT, () => console.log('API on :' + process.env.PORT));
