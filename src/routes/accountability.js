@@ -2,6 +2,7 @@
 const express = require('express');
 const Accountability = require('../models/Accountability');
 const auth = require('../middleware/auth');
+const User = require('../models/User');   
 
 const router = express.Router();
 
@@ -54,27 +55,35 @@ router.post('/', auth, async (req, res) => {
       return res.status(400).json({ error: 'description and imageBase64 are required' });
     }
 
-    // Basic base64 size guard (supports both raw base64 and data URLs)
-    const base64 = (imageBase64 || '').includes('base64,')
-      ? imageBase64.split('base64,')[1]
-      : imageBase64;
-
-    // Estimate bytes; 4/3 expansion for base64 minus padding
-    const approxBytes = Math.floor((base64.length * 3) / 4);
-    if (approxBytes > MAX_IMAGE_BYTES) {
-      return res.status(413).json({ error: `Image too large (> ${Math.round(MAX_IMAGE_BYTES/1024/1024)}MB)` });
+    // 1) Get gymId automatically
+    let gymId = req.userGymId;
+    if (!gymId) {
+      const u = await User.findById(req.userId).select('gymId').lean();
+      if (!u) return res.status(401).json({ error: 'User not found' });
+      gymId = u.gymId;
+    }
+    if (typeof gymId === 'string' && /^[0-9a-fA-F]{24}$/.test(gymId)) {
+      gymId = new mongoose.Types.ObjectId(gymId);
     }
 
+    // 2) Image size guard
+    const base64 = imageBase64.includes('base64,') ? imageBase64.split('base64,')[1] : imageBase64;
+    const approxBytes = Math.floor((base64.length * 3) / 4);
+    if (approxBytes > MAX_IMAGE_BYTES) {
+      return res.status(413).json({ error: 'Image too large' });
+    }
+
+    // 3) Create accountability doc
     const doc = await Accountability.create({
       description,
       imageBase64,
       userId: req.userId,
-      gymId: req.userGymId || req.body.gymId // prefer gym from JWT if available
+      gymId,     // 👈 now always populated
     });
 
     res.status(201).json(doc);
   } catch (e) {
-    console.error(e);
+    console.error('[ACC POST]', e);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -103,8 +112,8 @@ router.delete('/:id', auth, async (req, res) => {
       return res.status(404).json({ error: 'Post not found' });
     }
 
-    // No content on successful delete
-    return res.status(204).send();
+    return res.status(200).json({ message: 'Accountability post deleted successfully', postId: id });
+
   } catch (e) {
     console.error(e);
     return res.status(500).json({ error: 'Server error' });

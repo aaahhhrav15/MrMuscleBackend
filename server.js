@@ -8,6 +8,7 @@ const userRoutes = require('./src/routes/users');
 const nutritionRoutes = require('./src/routes/nutrition');
 const assignedWorkoutRoutes = require('./src/routes/assignedWorkouts');
 const accountabilityRoutes = require('./src/routes/accountability');
+const resultsRoutes = require('./src/routes/results');
 
 const app = express();
 app.use(cors());
@@ -28,5 +29,6 @@ app.use('/users', userRoutes);
 app.use('/nutrition', nutritionRoutes);
 app.use('/workouts/assigned', assignedWorkoutRoutes);
 app.use('/accountability', accountabilityRoutes);
+app.use('/results', resultsRoutes);
 
 app.listen(process.env.PORT, () => console.log('API on :' + process.env.PORT));

@@ -8,7 +8,7 @@ const AccountabilitySchema = new mongoose.Schema({
   userId:     { type: mongoose.Schema.Types.ObjectId, ref: 'User', index: true, required: true },
 }, {
   timestamps: true,
-  collection: 'accountability'
+  collection: 'accountabilities'
 });
 
 // helpful index for user timeline
