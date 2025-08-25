@@ -26,6 +26,8 @@ router.get('/me', auth, async (req, res) => {
       membershipStartDate: u.membershipStartDate,
       name: u.name,
       phone: u.phone,
+      weight: u.weight,
+      height: u.height,
     });
   } catch (e) {
     return res.status(500).json({ error: e.message });
