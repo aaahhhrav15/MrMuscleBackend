@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');                 // points to musclecrm.customers via your model
 const { setOtp, getOtp, deleteOtp } = require('../otp/otpStore');
 const { normalize, tail10 } = require('../util/phone'); // simple helpers (+91 default, last10, etc.)
+const axios = require('axios'); // Ensure axios is imported
 
 const router = express.Router();
 const OTP_TTL = parseInt(process.env.OTP_TTL_SECONDS || '300', 10);
@@ -53,10 +54,42 @@ router.post('/login-phone', async (req, res) => {
     const code = generateOtp();
     setOtp(norm, code, OTP_TTL);
 
-    if (process.env.DEV_MODE === 'true') {
+    if (process.env.DEV_MODE === 'false') {
       console.log(`[DEV] OTP for ${norm}: ${code}`);
     } else {
-      // TODO: integrate SMS provider here (e.g., Twilio)
+      const SMS_API_URL = process.env.SMS_API_URL;
+      const SMS_CONFIG = {
+        API_KEY: process.env.SMS_API_KEY,
+        SENDER_ID: process.env.SMS_SENDER_ID,
+        PE_ID: process.env.SMS_PE_ID,
+        TEMPLATE_ID: process.env.SMS_TEMPLATE_ID,
+      };
+
+      const message = `Your password reset OTP is ${code}. Do not share this with anyone. If you did not request this, please ignore. \n- MeeraAI Tech Solutions LLP`;
+
+      const payload = {
+        apikey: SMS_CONFIG.API_KEY,
+        senderid: SMS_CONFIG.SENDER_ID,
+        number: norm.replace('+91', '').replace('+', '').trim(),
+        message,
+        peid: SMS_CONFIG.PE_ID,
+        templateid: SMS_CONFIG.TEMPLATE_ID,
+      };
+
+      try {
+        const response = await axios.post(SMS_API_URL, payload, {
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          timeout: 30000,
+        });
+
+        console.log(`[SMS_API] Response for ${norm}:`, response.data);
+      } catch (error) {
+        console.error(`[SMS_API] Failed to send OTP to ${norm}:`, error.message);
+        return res.status(500).json({ error: 'Failed to send OTP' });
+      }
     }
 
     return res.json({ ok: true, ttl: OTP_TTL });
