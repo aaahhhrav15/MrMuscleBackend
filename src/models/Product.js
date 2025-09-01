@@ -19,10 +19,6 @@ const productSchema = new mongoose.Schema({
     ref: 'Gym',
     required: true,
   },
-  imageBase64: {
-    type: String,
-    required: true,
-  },
   keyBenefits: {
     type: [String],
     required: true,
@@ -64,6 +60,10 @@ const productSchema = new mongoose.Schema({
     required: true,
   },
   url: {
+    type: String,
+    required: true,
+  },
+  imageUrl: {
     type: String,
     required: true,
   },
