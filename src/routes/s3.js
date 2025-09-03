@@ -1,5 +1,5 @@
 const express = require('express');
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const auth = require('../middleware/auth');
 
@@ -39,6 +39,30 @@ router.post('/presigned-url', auth, async (req, res) => {
   } catch (e) {
     console.error('[S3 PRESIGNED URL]', e);
     res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+/**
+ * DELETE /s3/delete
+ * Body: { "key": "path/to/file.jpg" }
+ * Auth required
+ */
+router.delete('/delete', auth, async (req, res) => {
+  const { key } = req.body;
+  if (!key) {
+    return res.status(400).json({ error: 'File key is required.' });
+  }
+  const params = {
+    Bucket: BUCKET_NAME,
+    Key: key,
+  };
+  try {
+    await s3.send(new DeleteObjectCommand(params));
+    res.json({ message: 'File deleted successfully.' });
+  } catch (err) {
+    console.error('[S3 DELETE]', err);
+    res.status(500).json({ error: 'Failed to delete file.', details: err.message });
   }
 });
 

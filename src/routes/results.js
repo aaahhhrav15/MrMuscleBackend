@@ -53,13 +53,33 @@ router.post('/s3', auth, async (req, res) => {
       userId: req.userId,
       weight,
       description,
-      imageUrl: s3Url, // Save the S3 URL in MongoDB
+      s3Key: s3Url, // Save the S3 URL in MongoDB
     });
 
     await newResult.save();
     res.status(201).json(newResult);
   } catch (e) {
     console.error('[RESULTS POST]', e);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+/**
+ * DELETE /results/:id
+ * Delete a user's result post by ID (must be owner)
+ */
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const post = await Result.findOne({ _id: id, userId: req.userId });
+    if (!post) {
+      return res.status(404).json({ error: 'Result not found or not authorized' });
+    }
+    const s3Key = post.s3Key;
+    await Result.deleteOne({ _id: id });
+    res.json({ message: 'Result post deleted.', s3Key });
+  } catch (e) {
     res.status(500).json({ error: 'Server error' });
   }
 });

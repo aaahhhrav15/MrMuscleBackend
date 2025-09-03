@@ -65,4 +65,24 @@ router.post('/s3', auth, async (req, res) => {
   }
 });
 
+
+/**
+ * DELETE /accountability/:id
+ * Delete a user's accountability post by ID (must be owner)
+ */
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const post = await Accountability.findOne({ _id: id, userId: req.userId });
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found or not authorized' });
+    }
+    const s3Key = post.s3Key;
+    await Accountability.deleteOne({ _id: id });
+    res.json({ message: 'Accountability post deleted.', s3Key });
+  } catch (e) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = router;

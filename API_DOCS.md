@@ -130,6 +130,7 @@ Returns a specific day's exercises from the user's current assigned plan.
 #### GET `/accountability`
 Returns the user's accountability posts. Query params: `limit`, `skip`.
 
+
 #### POST `/accountability/s3`
 Create a new accountability post with an S3 key.
 Request:
@@ -140,12 +141,27 @@ Request:
 }
 ```
 
+#### DELETE `/accountability/:id`
+Delete an accountability post by its ID (only the owner can delete).
+
+**Headers:**
+- `Authorization: Bearer <JWT_TOKEN>`
+
+**Response:**
+```json
+{
+  "message": "Accountability post deleted.",
+  "s3Key": "s3/path/to/file.jpg"
+}
+```
+
 ---
 
 ### 7. Results
 
 #### GET `/results`
 Returns the user's results posts. Query params: `limit`, `skip`.
+
 
 #### POST `/results/s3`
 Create a new results post with an S3 URL.
@@ -154,7 +170,21 @@ Request:
 {
   "weight": 70,
   "description": "Progress update",
-  "s3Url": "https://..."
+  "s3Key": "https://..."
+}
+```
+
+#### DELETE `/results/:id`
+Delete a result post by its ID (only the owner can delete).
+
+**Headers:**
+- `Authorization: Bearer <JWT_TOKEN>`
+
+**Response:**
+```json
+{
+  "message": "Result post deleted.",
+  "s3Key": "s3/path/or/url/to/file.jpg"
 }
 ```
 
@@ -165,12 +195,27 @@ Request:
 #### GET `/reels`
 Returns all reels.
 
+
 #### POST `/reels/s3`
 Create a new reel with an S3 key.
 Request:
 ```json
 {
   "caption": "...",
+  "s3Key": "s3/path/to/video.mp4"
+}
+```
+
+#### DELETE `/reels/:id`
+Delete a reel by its ID (only the owner can delete).
+
+**Headers:**
+- `Authorization: Bearer <JWT_TOKEN>`
+
+**Response:**
+```json
+{
+  "message": "Reel deleted.",
   "s3Key": "s3/path/to/video.mp4"
 }
 ```
@@ -184,7 +229,9 @@ Returns products for the logged-in customer.
 
 ---
 
+
 ### 10. S3
+
 
 #### POST `/s3/presigned-url`
 Generates a pre-signed S3 upload URL.
@@ -201,6 +248,26 @@ Response:
 {
   "url": "https://...",
   "key": "uploads/file.jpg"
+}
+```
+
+#### DELETE `/s3/delete`
+Delete a file from S3 by its key.
+
+**Headers:**
+- `Authorization: Bearer <JWT_TOKEN>`
+- `Content-Type: application/json`
+
+**Body:**
+```json
+{
+  "key": "folder/filename.jpg"
+}
+```
+**Response:**
+```json
+{
+  "message": "File deleted successfully."
 }
 ```
 

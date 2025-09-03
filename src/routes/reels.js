@@ -28,4 +28,24 @@ router.post('/s3', auth, async (req, res) => {
   }
 });
 
+
+/**
+ * DELETE /reels/:id
+ * Delete a user's reel by ID (must be owner)
+ */
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const reel = await Reels.findOne({ _id: id, customerId: req.userId });
+    if (!reel) {
+      return res.status(404).json({ error: 'Reel not found or not authorized' });
+    }
+    const s3Key = reel.s3Key;
+    await Reels.deleteOne({ _id: id });
+    res.json({ message: 'Reel deleted.', s3Key });
+  } catch (e) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = router;
