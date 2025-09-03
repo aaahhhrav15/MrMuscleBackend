@@ -15,26 +15,16 @@ router.get('/', async (req, res) => {
 });
 
 // Post a new reel
-router.post('/', auth, async (req, res) => {
-  const { caption, url } = req.body;
-  const customerId = req.userId; // Extracted from the auth middleware
+router.post('/s3', auth, async (req, res) => {
+  const { caption, s3Key } = req.body;
+  const customerId = req.userId;
   try {
-    const newReel = new Reels({ caption, customerId, url });
+    const newReel = new Reels({ caption, customerId, s3Key });
     await newReel.save();
     res.status(201).json(newReel);
   } catch (error) {
+    res.status(500).json({ "[Reel POST]": error });
     res.status(500).json({ error: 'Failed to create reel' });
-  }
-});
-
-// Delete a reel
-router.delete('/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    await Reels.findByIdAndDelete(id);
-    res.status(200).json({ message: 'Reel deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to delete reel' });
   }
 });
 

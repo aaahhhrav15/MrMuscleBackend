@@ -54,7 +54,7 @@ router.post('/login-phone', async (req, res) => {
     const code = generateOtp();
     setOtp(norm, code, OTP_TTL);
 
-    if (process.env.DEV_MODE === 'false') {
+    if (process.env.DEV_MODE === 'true') {
       console.log(`[DEV] OTP for ${norm}: ${code}`);
     } else {
       const SMS_API_URL = process.env.SMS_API_URL;

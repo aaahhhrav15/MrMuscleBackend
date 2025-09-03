@@ -10,9 +10,9 @@ const reelsSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  url: {
+  s3Key: {
     type: String,
-    required: true,
+    required: true, 
   },
 }, { timestamps: true });
 

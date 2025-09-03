@@ -13,12 +13,11 @@ const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   weight: { type: Number, required: true },
   height: { type: Number, required: true },
-
-  // IMPORTANT: some DBs store phone as string, others as number. Mixed covers both.
   phone: { type: mongoose.Schema.Types.Mixed, required: true },
+  profilePhoto: { type: String },
 }, {
   timestamps: true,
-  collection: 'customers',       // 👈 your collection
+  collection: 'customers',
 });
 
 // If you ever insert/modify, write in canonical E.164
