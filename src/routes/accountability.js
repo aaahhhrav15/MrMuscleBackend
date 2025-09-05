@@ -45,7 +45,7 @@ router.get('/', auth, async (req, res) => {
  */
 router.post('/s3', auth, async (req, res) => {
   try {
-    const { description, key } = req.body;
+    const { description, s3key } = req.body;
 
     if (!key) {
       return res.status(400).json({ error: 'S3 key is required' });
@@ -54,7 +54,7 @@ router.post('/s3', auth, async (req, res) => {
     const newPost = new Accountability({
       userId: req.userId,
       description,
-      s3Key: key,
+      s3Key: s3key,
     });
 
     await newPost.save();

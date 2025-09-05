@@ -14,7 +14,7 @@ const UserSchema = new mongoose.Schema({
   weight: { type: Number, required: true },
   height: { type: Number, required: true },
   phone: { type: mongoose.Schema.Types.Mixed, required: true },
-  profilePhoto: { type: String },
+  profileImage: { type: String },
 }, {
   timestamps: true,
   collection: 'customers',

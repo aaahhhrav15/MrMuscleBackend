@@ -29,7 +29,7 @@ router.get('/me', auth, async (req, res) => {
       phone: u.phone,
       weight: u.weight,
       height: u.height,
-      profilePhoto: u.profilePhoto,
+      profileImage: u.profileImage ,
     });
   } catch (e) {
     return res.status(500).json({ error: e.message });
@@ -43,7 +43,7 @@ router.get('/me', auth, async (req, res) => {
 router.patch('/update', auth, async (req, res) => {
   try {
     // Only allow these fields to be updated
-    const allowedFields = ['name', 'phone', 'weight', 'height', 'profilePhoto'];
+    const allowedFields = ['name', 'phone', 'weight', 'height', 'profileImage'];
     const update = {};
     for (const field of allowedFields) {
       if (req.body[field] !== undefined) {
@@ -72,7 +72,7 @@ router.patch('/update', auth, async (req, res) => {
       phone: updated.phone,
       weight: updated.weight,
       height: updated.height,
-      profilePhoto: updated.profilePhoto,
+      profileImage: updated.profileImage,
     });
   } catch (e) {
     return res.status(500).json({ error: e.message });
