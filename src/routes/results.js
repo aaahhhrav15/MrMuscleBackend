@@ -43,9 +43,9 @@ router.get('/', auth, async (req, res) => {
  */
 router.post('/s3', auth, async (req, res) => {
   try {
-    const { weight, description, s3Url } = req.body;
+    const { weight, description, s3Key } = req.body;
 
-    if (!s3Url) {
+    if (!s3Key) {
       return res.status(400).json({ error: 'S3 URL is required' });
     }
 
@@ -53,7 +53,7 @@ router.post('/s3', auth, async (req, res) => {
       userId: req.userId,
       weight,
       description,
-      s3Key: s3Url, // Save the S3 URL in MongoDB
+      s3Key // Save the S3 URL in MongoDB
     });
 
     await newResult.save();

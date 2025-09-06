@@ -45,26 +45,46 @@ router.get('/', auth, async (req, res) => {
  */
 router.post('/s3', auth, async (req, res) => {
   try {
-    const { description, s3key } = req.body;
+    console.log('=== ACCOUNTABILITY POST DEBUG ===');
+    console.log('Request body:', req.body);
+    console.log('User ID:', req.userId);
+    
+    const { description, s3Key } = req.body; // Changed from s3key to s3Key
 
-    if (!key) {
+    if (!s3Key) { // Changed from key to s3Key
+      console.log('Missing s3Key in request');
       return res.status(400).json({ error: 'S3 key is required' });
     }
+
+    if (!description) {
+      console.log('Missing description in request');
+      return res.status(400).json({ error: 'Description is required' });
+    }
+
+    console.log('Creating new post with:', {
+      userId: req.userId,
+      description,
+      s3Key
+    });
 
     const newPost = new Accountability({
       userId: req.userId,
       description,
-      s3Key: s3key,
+      s3Key, // Changed from s3key to s3Key to match schema
     });
 
-    await newPost.save();
-    res.status(201).json(newPost);
+    const savedPost = await newPost.save();
+    console.log('Successfully saved:', savedPost);
+    
+    res.status(201).json(savedPost);
   } catch (e) {
-    console.error('[ACCOUNTABILITY POST]', e);
-    res.status(500).json({ error: 'Server error' });
+    console.error('[ACCOUNTABILITY POST ERROR]', e);
+    res.status(500).json({ 
+      error: 'Server error', 
+      details: e.message // Add details for debugging
+    });
   }
 });
-
 
 /**
  * DELETE /accountability/:id
