@@ -1,7 +1,7 @@
 // src/routes/auth.js
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');                 // points to musclecrm.customers via your model
+const User = require('../models/Users');                 // points to musclecrm.customers via your model
 const { setOtp, getOtp, deleteOtp } = require('../otp/otpStore');
 const { normalize, tail10 } = require('../util/phone'); // simple helpers (+91 default, last10, etc.)
 const axios = require('axios'); // Ensure axios is imported
